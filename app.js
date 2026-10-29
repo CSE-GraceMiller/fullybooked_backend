@@ -1,24 +1,84 @@
-const mongoose = require("mongoose");
+const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
+const app = express();
+app.use(express.static("public"));
+app.use(express.json());
+app.use(cors());
 
-//testdb is name of database, it will automatically make it
-mongoose
-  .connect("mongodb+srv://gem14_db_user:romman89@cluster0.9vnoo9v.mongodb.net/")
-  .then(() => console.log("Connected to mongodb..."))
-  .catch((err) => console.error("could not connect ot mongodb...", err));
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./public/images/");
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
+    },
+  });
+  
+const upload = multer({ storage: storage });
 
-const schema = new mongoose.Schema({
-  name: String,
+let books = [
+  {
+    "_id": 1,
+    "title": "Pip Plants a Planet",
+    "author": "Elin Carter",
+    "description": "A little act of kindness can grow a greener world",
+    "genre": "Environment",
+    "available": true,
+    "img_name": "book-pip-plants-a-planet.png"
+  },
+  {
+    "_id": 2,
+    "title": "The Cloud Collectors",
+    "author": "Nora Fields",
+    "description": "Two friends chase clouds and find something even better",
+    "genre": "Adventure, Friendship",
+    "available": true,
+    "img_name": "book-the-cloud-collectors.png"
+  },
+  {
+    "_id": 3,
+    "title": "The Robot Who Read",
+    "author": "Kai Mendoza",
+    "description": "A Robot discovers that stories can change everything",
+    "genre": "Friendship",
+    "available": true,
+    "img_name": "book-the-robot-who-read.png"
+  },
+  {
+    "_id": 4,
+    "title": "The Mystery of Willow Creek",
+    "author": "Jack Holloway",
+    "description": "Three friends, one clue, a summer to remember",
+    "genre": "Adventure, Friendship",
+    "available": true,
+    "img_name": "book-the-mystery-of-mossy-creek.png"
+  },
+  {
+    "_id": 5,
+    "title": "A House For Everyone",
+    "author": "Mateo Singh",
+    "description": "Different homes, one big world, a celebration of belonging",
+    "genre": "Animals, Friendship",
+    "available": true,
+    "img_name": "book-a-house-for-everyone.png"
+  },
+  {
+    "_id": 6,
+    "title": "Stella and The Shooting Star",
+    "author": "Priya Raman",
+    "description": "The biggest dreams start with a small wish",
+    "genre": "Adventure",
+    "available": true,
+    "img_name": "book-stella-and-the-shooting-star.png"
+  }
+]
+
+app.get("/api/books", (req,res)=>{
+    res.send(books)
 });
 
-async function createMessage() {
-  const result = await message.save();
-  console.log(result);
-}
-
-//this creates a Message class in our app
-const Message = mongoose.model("Message", schema);
-const message = new Message({
-  name: "Hello World",
+//listens for incoming requests
+app.listen(3001, ()=>{
+    console.log("Server is up and running");
 });
-
-createMessage();
