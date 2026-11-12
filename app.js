@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const app = express();
+const Joi = require("joi");
 app.use(express.static("public"));
 app.use(express.json());
 app.use(cors());
@@ -78,7 +79,47 @@ app.get("/api/books", (req,res)=>{
     res.send(books)
 });
 
-//listens for incoming requests
-app.listen(3001, ()=>{
-    console.log("Server is up and running");
+app.post("/api/books", upload.single("img"), (req, res) => {
+  const result = validateBook(req.body);
+
+  if (result.error) {
+    console.log("Error in validation");
+    res.status(400).send(result.error.details[0].message);
+    return;
+  }
+
+  const book = {
+    _id: books.length + 1,
+    title: req.body.title,
+    author: req.body.author,
+    description: req.body.description,
+    genre: req.body.genre,
+    available: req.body.available === "true" || req.body.available === true,
+  };
+
+  if (req.file) {
+    book.img_name = req.file.filename;
+  }
+
+  books.push(book);
+
+  res.status(200).send(book);
+});
+
+const validateBook = (book) => {
+  const schema = Joi.object({
+    _id: Joi.allow(""),
+    title: Joi.string().min(3).required(),
+    author: Joi.string().required(),
+    description: Joi.string().min(5).required(),
+    genre: Joi.string().required(),
+    available: Joi.allow(""),
+    img: Joi.allow(""),
+  });
+
+  return schema.validate(book);
+};
+
+app.listen(3001, () => {
+  console.log("Server is up and running");
 });
